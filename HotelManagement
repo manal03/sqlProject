@@ -1,0 +1,28 @@
+#get total revenue_realized
+SELECT SUM(revenue_realized) as total_revenue FROM fact_bookings;
+
+#total number of bookings occuring 
+SELECT COUNT(booking_id) as total_bookings FROM fact_bookings;
+
+#total capacity of rooms present 
+SELECT SUM(capacity) as capacity FROM fact_aggregated_bookings;
+
+#total successful bookings
+SELECT SUM(successful_bookings) as bookings_successful FROM fact_aggregated_bookings;
+
+#occupancy percentage, division of successful bookings and capacity x 100
+SELECT CONCAT(ROUND(SUM(successful_bookings)/SUM(capacity),0),'%') as occupancy_rate FROM fact_aggregated_bookings;
+
+#average ratings of customers 
+SELECT ROUND(AVG(ratings_given),2) as avg_rating FROM fact_bookings;
+
+#number of days existing, difference between the max and min date, +1 used to include the last date
+SELECT DATEDIFF(MAX(STR_TO_DATE(dim_date.date, '%d-%b-%y')), MIN(STR_TO_DATE(dim_date.date, '%d-%b-%y'))) + 1 AS date_diff
+FROM dim_date;
+
+#calculate percentage cancellation
+SELECT 
+    CONCAT(ROUND(COUNT(CASE WHEN booking_status = "Cancelled" THEN 1 END) / 
+    COUNT(CASE WHEN booking_status <> "Cancelled" THEN 1 END) * 100,2), '%') AS Cancellation_Percentage
+FROM 
+    fact_bookings;
